@@ -34,7 +34,7 @@ function createBlogs(req, res) {
                     .then(function (result) {
                         if (err)
                             res.sendStatus(404);
-                        else{
+                        else {
                             res.send({ "message": "New Blog Created!" });
                         }
                     });
@@ -51,15 +51,17 @@ function updateBlogs(req, res) {
             if (blogs) {
                 var blogsObjects = JSON.parse(blogs);
                 var updateBlogIndex = blogsObjects.findIndex(obj => obj.blogID === req.params.blogID);
-                blogsObjects[updateBlogIndex] = req.body;
+                if (updateBlogIndex !== -1) {
+                    blogsObjects[updateBlogIndex] = req.body;
 
-                blogService.writeBlogFile(blogsObjects)
-                    .then(function (result) {
-                        if (err)
-                            res.sendStatus(404);
-                        else
-                            res.send({ "message": "Blog Updated!" });
-                    });
+                    blogService.writeBlogFile(blogsObjects)
+                        .then(function (result) {
+                            if (err)
+                                res.sendStatus(404);
+                            else
+                                res.send({ "message": "Blog Updated!" });
+                        });
+                }
             }
             else {
                 res.sendStatus(404);
@@ -69,24 +71,26 @@ function updateBlogs(req, res) {
 
 function deleteBlogs(req, res) {
     blogService.readBlogsFile()
-    .then(function (blogs) {
-        if (blogs) {
-            var blogsObjects = JSON.parse(blogs);
-            var updateBlogIndex = blogsObjects.findIndex(obj => obj.blogID === req.params.blogID);
-            blogsObjects.splice(updateBlogIndex, 1);
-            
-            blogService.writeBlogFile(blogsObjects)
-                .then(function (result) {
-                    if (err)
-                        res.sendStatus(404);
-                    else
-                        res.send({ "message": "Blog Deleted!" });
-                });
-        }
-        else {
-            res.sendStatus(404);
-        }
-    });
+        .then(function (blogs) {
+            if (blogs) {
+                var blogsObjects = JSON.parse(blogs);
+                var updateBlogIndex = blogsObjects.findIndex(obj => obj.blogID === req.params.blogID);
+                if (updateBlogIndex !== -1) {
+                    blogsObjects.splice(updateBlogIndex, 1);
+
+                    blogService.writeBlogFile(blogsObjects)
+                        .then(function (result) {
+                            if (err)
+                                res.sendStatus(404);
+                            else
+                                res.send({ "message": "Blog Deleted!" });
+                        });
+                }
+            }
+            else {
+                res.sendStatus(404);
+            }
+        });
 }
 
 module.exports = router;
