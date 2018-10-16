@@ -5,7 +5,9 @@ var fs = require('fs');
 var blogService = require('./blogService');
 
 var router = express.Router();
-router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 router.get('/blogs', getBlogs);
 router.post('/blogs', createBlogs);
@@ -15,9 +17,9 @@ router.delete('/blogs/:blogID', deleteBlogs);
 function getBlogs(req, res) {
     blogService.readBlogsFile()
         .then(function (blogs) {
-            if (blogs)
+            if (blogs) {
                 res.send(JSON.parse(blogs));
-            else {
+            } else {
                 res.sendStatus(404);
             }
         });
@@ -32,14 +34,15 @@ function createBlogs(req, res) {
                 blogsObjects.push(req.body);
                 blogService.writeBlogFile(blogsObjects)
                     .then(function (result) {
-                        if (err)
+                        if (result === "success") {
+                            res.send({
+                                "message": "New Blog Created!"
+                            });
+                        } else {
                             res.sendStatus(404);
-                        else {
-                            res.send({ "message": "New Blog Created!" });
                         }
                     });
-            }
-            else {
+            } else {
                 res.sendStatus(404);
             }
         });
@@ -56,14 +59,16 @@ function updateBlogs(req, res) {
 
                     blogService.writeBlogFile(blogsObjects)
                         .then(function (result) {
-                            if (err)
+                            if (result === "success") {
+                                res.send({
+                                    "message": "Blog Updated!"
+                                });
+                            } else {
                                 res.sendStatus(404);
-                            else
-                                res.send({ "message": "Blog Updated!" });
+                            }
                         });
                 }
-            }
-            else {
+            } else {
                 res.sendStatus(404);
             }
         });
@@ -80,14 +85,16 @@ function deleteBlogs(req, res) {
 
                     blogService.writeBlogFile(blogsObjects)
                         .then(function (result) {
-                            if (err)
+                            if (result === "success") {
+                                res.send({
+                                    "message": "Blog Deleted!"
+                                });
+                            } else {
                                 res.sendStatus(404);
-                            else
-                                res.send({ "message": "Blog Deleted!" });
+                            }
                         });
                 }
-            }
-            else {
+            } else {
                 res.sendStatus(404);
             }
         });
